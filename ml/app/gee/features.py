@@ -33,18 +33,59 @@ class GEEFeatureProvider:
         
         # 2. Extract Terrain
         try:
+            import math
             dem = ee.Image(TERRAIN_DATASET)
             terrain = ee.Terrain.products(dem)
-            terrain_stats = terrain.reduceRegion(
-                reducer=ee.Reducer.mean(),
-                geometry=grid_geom,
-                scale=30,
-                maxPixels=1e9
-            ).getInfo()
             
-            features["elevation"] = terrain_stats.get("elevation")
-            features["slope"] = terrain_stats.get("slope")
-            features["aspect"] = terrain_stats.get("aspect")
+            elevation = terrain.select('elevation')
+            slope = terrain.select('slope')
+            aspect = terrain.select('aspect')
+            
+            aspect_rad = aspect.multiply(math.pi / 180.0)
+            aspect_sin = aspect_rad.sin().rename('aspect_sin')
+            aspect_cos = aspect_rad.cos().rename('aspect_cos')
+            
+            reducer = ee.Reducer.mean().combine(
+                reducer2=ee.Reducer.minMax(), sharedInputs=True
+            ).combine(
+                reducer2=ee.Reducer.stdDev(), sharedInputs=True
+            )
+            slope_percentiles = ee.Reducer.percentile([25, 50, 75, 90])
+            
+            elev_stats = elevation.reduceRegion(reducer=reducer, geometry=grid_geom, scale=30, maxPixels=1e9).getInfo()
+            slope_stats = slope.reduceRegion(reducer=reducer, geometry=grid_geom, scale=30, maxPixels=1e9).getInfo()
+            slope_pct_stats = slope.reduceRegion(reducer=slope_percentiles, geometry=grid_geom, scale=30, maxPixels=1e9).getInfo()
+            aspect_sin_mean = aspect_sin.reduceRegion(reducer=ee.Reducer.mean(), geometry=grid_geom, scale=30, maxPixels=1e9).getInfo()
+            aspect_cos_mean = aspect_cos.reduceRegion(reducer=ee.Reducer.mean(), geometry=grid_geom, scale=30, maxPixels=1e9).getInfo()
+            aspect_scalar = aspect.reduceRegion(reducer=ee.Reducer.mean(), geometry=grid_geom, scale=30, maxPixels=1e9).getInfo()
+            
+            # Old scalar features for GridFeatures backward compatibility
+            features["elevation"] = elev_stats.get("elevation_mean")
+            features["slope"] = slope_stats.get("slope_mean")
+            features["aspect"] = aspect_scalar.get("aspect")
+            
+            # 15 model features
+            features["mean_elevation_m"] = elev_stats.get("elevation_mean")
+            features["min_elevation_m"] = elev_stats.get("elevation_min")
+            features["max_elevation_m"] = elev_stats.get("elevation_max")
+            
+            # Safely calculate range
+            emin = elev_stats.get("elevation_min")
+            emax = elev_stats.get("elevation_max")
+            features["elevation_range_m"] = (emax - emin) if (emax is not None and emin is not None) else None
+            features["std_elevation_m"] = elev_stats.get("elevation_stdDev")
+            
+            features["mean_slope_deg"] = slope_stats.get("slope_mean")
+            features["min_slope_deg"] = slope_stats.get("slope_min")
+            features["max_slope_deg"] = slope_stats.get("slope_max")
+            features["std_slope_deg"] = slope_stats.get("slope_stdDev")
+            features["p25_slope_deg"] = slope_pct_stats.get("slope_p25")
+            features["p50_slope_deg"] = slope_pct_stats.get("slope_p50")
+            features["p75_slope_deg"] = slope_pct_stats.get("slope_p75")
+            features["p90_slope_deg"] = slope_pct_stats.get("slope_p90")
+            
+            features["mean_aspect_sin"] = aspect_sin_mean.get("aspect_sin")
+            features["mean_aspect_cos"] = aspect_cos_mean.get("aspect_cos")
             
             dataset_lineage["terrain"] = DatasetLineage(
                 dataset_id=TERRAIN_DATASET

@@ -50,6 +50,27 @@ class AcquiredFeatures(BaseModel):
                 f"Susceptibility status: {self.susceptibility.status}"
             )
             
+        from app.features.schemas import StaticModelFeatures
+        model_features_obj = None
+        if "mean_elevation_m" in self.features:
+            model_features_obj = StaticModelFeatures(
+                mean_elevation_m=self.features["mean_elevation_m"],
+                min_elevation_m=self.features["min_elevation_m"],
+                max_elevation_m=self.features["max_elevation_m"],
+                elevation_range_m=self.features["elevation_range_m"],
+                std_elevation_m=self.features["std_elevation_m"],
+                mean_slope_deg=self.features["mean_slope_deg"],
+                min_slope_deg=self.features["min_slope_deg"],
+                max_slope_deg=self.features["max_slope_deg"],
+                std_slope_deg=self.features["std_slope_deg"],
+                p25_slope_deg=self.features["p25_slope_deg"],
+                p50_slope_deg=self.features["p50_slope_deg"],
+                p75_slope_deg=self.features["p75_slope_deg"],
+                p90_slope_deg=self.features["p90_slope_deg"],
+                mean_aspect_sin=self.features["mean_aspect_sin"],
+                mean_aspect_cos=self.features["mean_aspect_cos"],
+            )
+
         return GridFeatures(
             grid_code=self.grid_code,
             elevation=self.features["elevation"],
@@ -60,5 +81,6 @@ class AcquiredFeatures(BaseModel):
             rainfall_7d=self.features["rainfall_7d"],
             land_cover=self.features["land_cover"],
             susceptibility=self.features.get("susceptibility", 0.0),
-            is_test_data=self.is_test_data
+            is_test_data=self.is_test_data,
+            model_features=model_features_obj
         )

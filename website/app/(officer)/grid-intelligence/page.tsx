@@ -208,43 +208,91 @@ export default function GridIntelligencePage() {
                 </section>
 
                 <section>
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">ML / Prediction</h3>
-                  {gridDetail.prediction ? (
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Model Output</h3>
+                  {gridDetail.model_output ? (
                     <div className="bg-slate-50 p-4 rounded-lg border space-y-4">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div>
-                          <div className="text-xs text-slate-500">Risk Score</div>
-                          <div className="font-mono text-xl font-bold">{gridDetail.prediction.risk_score}</div>
+                          <div className="text-xs text-slate-500">Calibrated Probability</div>
+                          <div className="font-mono text-xl font-bold">{(gridDetail.model_output.calibrated_probability * 100).toFixed(4)}%</div>
                         </div>
-                        <div>
-                          <div className="text-xs text-slate-500">Risk Category</div>
-                          <Badge variant={gridDetail.prediction.risk_score >= 80 ? "risk_high" : gridDetail.prediction.risk_score >= 60 ? "risk_moderate" : "risk_low"}>
-                            {gridDetail.prediction.risk_category}
-                          </Badge>
-                        </div>
-                        <div>
-                          <div className="text-xs text-slate-500">Confidence</div>
-                          <div className="text-sm font-medium">{(gridDetail.prediction.confidence * 100).toFixed(1)}%</div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-slate-500">Generated</div>
-                          <div className="text-sm">{new Date(gridDetail.prediction.generated_at).toLocaleString()}</div>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 pt-3 border-t">
                         <div>
                           <div className="text-xs text-slate-500">Model Name</div>
-                          <div className="text-sm font-medium">{gridDetail.prediction.model_name}</div>
+                          <div className="text-sm font-medium">{gridDetail.model_output.model_name}</div>
                         </div>
                         <div>
                           <div className="text-xs text-slate-500">Version</div>
-                          <div className="font-mono text-xs mt-1">{gridDetail.prediction.model_version}</div>
+                          <div className="font-mono text-xs mt-1">{gridDetail.model_output.model_version}</div>
                         </div>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-sm text-slate-500 bg-slate-50 p-4 rounded-lg border">No prediction available from ML Engine</div>
+                    <div className="text-sm text-slate-500 bg-slate-50 p-4 rounded-lg border">No live prediction available from ML Engine</div>
                   )}
+                </section>
+
+                <section>
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Officer Assessment</h3>
+                  <div className="bg-slate-50 p-4 rounded-lg border space-y-4">
+                    {gridDetail.officer_assessment ? (
+                      <div>
+                        <div className="text-xs text-slate-500 mb-1">Operational Risk Category</div>
+                        <Badge variant={gridDetail.officer_assessment.risk_category === "VERY_HIGH" || gridDetail.officer_assessment.risk_category === "HIGH" ? "risk_high" : gridDetail.officer_assessment.risk_category === "MODERATE" ? "risk_moderate" : "risk_low"}>
+                          {gridDetail.officer_assessment.risk_category}
+                        </Badge>
+                        <div className="text-xs text-slate-500 mt-2">
+                          Set by {gridDetail.officer_assessment.model_name} ({gridDetail.officer_assessment.model_version})
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-slate-500 mb-4">No operational risk category has been assessed yet.</div>
+                    )}
+                    
+                    <div className="pt-4 border-t flex flex-col sm:flex-row sm:items-end gap-3">
+                      <div className="flex-1">
+                        <label className="text-xs font-bold text-slate-700 block mb-1">Assess Risk Category</label>
+                        <select 
+                          id="risk-assessment"
+                          className="w-full text-sm border rounded-md px-3 py-2 outline-none focus:border-primary bg-white"
+                          defaultValue=""
+                        >
+                          <option value="" disabled>Select category...</option>
+                          <option value="VERY_LOW">VERY LOW</option>
+                          <option value="LOW">LOW</option>
+                          <option value="MODERATE">MODERATE</option>
+                          <option value="HIGH">HIGH</option>
+                          <option value="VERY_HIGH">VERY HIGH</option>
+                        </select>
+                      </div>
+                      <button 
+                        onClick={async () => {
+                          const select = document.getElementById("risk-assessment") as HTMLSelectElement;
+                          if (!select.value) return;
+                          
+                          try {
+                            const res = await fetch(`/api/officer/grid-intelligence/${selectedGrid}/assess`, {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ risk_category: select.value })
+                            });
+                            if (res.ok) {
+                              const updated = await fetch(`/api/officer/grid-intelligence/${selectedGrid}`).then(r => r.json());
+                              setGridDetail(updated);
+                              alert("Assessment saved successfully.");
+                            } else {
+                              alert("Failed to save assessment.");
+                            }
+                          } catch (e) {
+                            console.error(e);
+                            alert("Error saving assessment.");
+                          }
+                        }}
+                        className="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 whitespace-nowrap"
+                      >
+                        Save Assessment
+                      </button>
+                    </div>
+                  </div>
                 </section>
 
                 <section>

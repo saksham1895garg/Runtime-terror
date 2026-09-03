@@ -1,0 +1,49 @@
+{
+  "primary_15": [
+    "mean_elevation_m",
+    "min_elevation_m",
+    "max_elevation_m",
+    "elevation_range_m",
+    "std_elevation_m",
+    "mean_slope_deg",
+    "min_slope_deg",
+    "max_slope_deg",
+    "std_slope_deg",
+    "p25_slope_deg",
+    "p50_slope_deg",
+    "p75_slope_deg",
+    "p90_slope_deg",
+    "mean_aspect_sin",
+    "mean_aspect_cos"
+  ],
+  "area_sensitivity_16_not_used_in_final_model": [
+    "mean_elevation_m",
+    "min_elevation_m",
+    "max_elevation_m",
+    "elevation_range_m",
+    "std_elevation_m",
+    "mean_slope_deg",
+    "min_slope_deg",
+    "max_slope_deg",
+    "std_slope_deg",
+    "p25_slope_deg",
+    "p50_slope_deg",
+    "p75_slope_deg",
+    "p90_slope_deg",
+    "mean_aspect_sin",
+    "mean_aspect_cos",
+    "unit_area_km2"
+  ],
+  "hard_banned": [
+    "aspect_features_complete",
+    "gsi_inventory_positive",
+    "gsi_landslide_record_count",
+    "gsi_material_count",
+    "gsi_movement_type_count",
+    "gsi_unique_slide_no_count",
+    "raster_cell_count",
+    "slope_features_complete",
+    "slope_unit_id",
+    "terrain_features_complete"
+  ]
+}

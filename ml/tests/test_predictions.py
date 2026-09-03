@@ -87,6 +87,8 @@ def test_prediction_missing_grid():
 def test_prediction_predictor_failure():
     # Override get_predictor for just this test
     class FailingPredictor(PredictorInterface):
+        def predict_probability(self, features):
+            raise Exception("Simulated predictor failure")
         def predict(self, features):
             raise Exception("Simulated predictor failure")
             
@@ -102,6 +104,8 @@ def test_prediction_predictor_failure():
 def test_prediction_model_not_available():
     # Test RealModelPredictor placeholder behavior
     class UnavailablePredictor(PredictorInterface):
+        def predict_probability(self, features):
+            raise ModelNotAvailableError("Model not found")
         def predict(self, features):
             raise ModelNotAvailableError("Model not found")
             

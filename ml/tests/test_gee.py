@@ -15,11 +15,30 @@ def test_gee_feature_provider_acquire(monkeypatch):
     mock_dem = MagicMock()
     mock_ee.Image.return_value = mock_dem
     mock_terrain = MagicMock()
-    mock_terrain.reduceRegion.return_value.getInfo.return_value = {
-        "elevation": 1500.0,
-        "slope": 10.5,
-        "aspect": 180.0
+    mock_selected = MagicMock()
+    mock_selected.reduceRegion.return_value.getInfo.return_value = {
+        "elevation_mean": 1500.0,
+        "elevation_min": 1400.0,
+        "elevation_max": 1600.0,
+        "elevation_stdDev": 10.0,
+        "slope_mean": 10.5,
+        "slope_min": 5.0,
+        "slope_max": 15.0,
+        "slope_stdDev": 2.0,
+        "slope_p25": 8.0,
+        "slope_p50": 10.0,
+        "slope_p75": 12.0,
+        "slope_p90": 14.0,
+        "aspect": 180.0,
+        "aspect_sin": 0.0,
+        "aspect_cos": -1.0
     }
+    mock_terrain.select.return_value = mock_selected
+    
+    mock_aspect_rad = MagicMock()
+    mock_terrain.select.return_value.multiply.return_value = mock_aspect_rad
+    mock_aspect_rad.sin.return_value.rename.return_value = mock_selected
+    mock_aspect_rad.cos.return_value.rename.return_value = mock_selected
     mock_ee.Terrain.products.return_value = mock_terrain
     
     # Mock ImageCollection (Rainfall and Land Cover)
@@ -41,8 +60,13 @@ def test_gee_feature_provider_acquire(monkeypatch):
     }
     mock_ee.ImageCollection.return_value = mock_img_col
     
-    mock_ee.Reducer.mean.return_value = "mean_reducer"
-    mock_ee.Reducer.mode.return_value = "mode_reducer"
+    mock_mean_reducer = MagicMock()
+    mock_mean_reducer.combine.return_value.combine.return_value = mock_mean_reducer
+    mock_ee.Reducer.mean.return_value = mock_mean_reducer
+    mock_ee.Reducer.mode.return_value = MagicMock()
+    mock_ee.Reducer.minMax.return_value = MagicMock()
+    mock_ee.Reducer.stdDev.return_value = MagicMock()
+    mock_ee.Reducer.percentile.return_value = MagicMock()
 
     # Inject mock into sys.modules
     import sys

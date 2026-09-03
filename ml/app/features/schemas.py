@@ -1,5 +1,6 @@
 import math
 from pydantic import BaseModel, Field, field_validator
+from typing import Optional
 
 class GridFeatures(BaseModel):
     """
@@ -17,6 +18,7 @@ class GridFeatures(BaseModel):
     land_cover: str = Field(..., description="Dominant land cover classification (Dynamic World)")
     susceptibility: float = Field(..., description="Static landslide susceptibility index. Currently UNRESOLVED in real-data; TestPredictor uses dummy values.")
     is_test_data: bool = Field(True, description="Flag indicating if this is test data")
+    model_features: Optional['StaticModelFeatures'] = Field(None, description="The 15 exact features required by the real ML model")
 
     @field_validator("elevation", "slope", "aspect", "rainfall_24h", "rainfall_72h", "rainfall_7d", "susceptibility")
     def reject_nan_and_inf(cls, v, info):
@@ -47,3 +49,27 @@ class GridFeatures(BaseModel):
         if not v or v.strip() == "":
             raise ValueError("Land cover classification cannot be empty")
         return v
+
+class StaticModelFeatures(BaseModel):
+    mean_elevation_m: float
+    min_elevation_m: float
+    max_elevation_m: float
+    elevation_range_m: float
+    std_elevation_m: float
+    mean_slope_deg: float
+    min_slope_deg: float
+    max_slope_deg: float
+    std_slope_deg: float
+    p25_slope_deg: float
+    p50_slope_deg: float
+    p75_slope_deg: float
+    p90_slope_deg: float
+    mean_aspect_sin: float
+    mean_aspect_cos: float
+
+    @field_validator("*")
+    def reject_nan_and_inf(cls, v, info):
+        if math.isnan(v) or math.isinf(v):
+            raise ValueError(f"{info.field_name} must be a valid finite number, got {v}")
+        return v
+
