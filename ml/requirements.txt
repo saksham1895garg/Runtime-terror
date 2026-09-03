@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+celery
+redis
+supabase
+pydantic
+python-dotenv
+earthengine-api  pydantic-settings

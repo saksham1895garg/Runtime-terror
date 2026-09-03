@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <!-- RADAR / DATA WAVES -->
+  <!-- Outer Ring -->
+  <path d="M 40 140 A 100 100 0 0 1 100 45" fill="none" stroke="#0F436B" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 140 45 A 100 100 0 0 1 200 140" fill="none" stroke="#0F436B" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Middle Ring -->
+  <path d="M 60 140 A 80 80 0 0 1 105 65" fill="none" stroke="#0F436B" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 155 75 A 80 80 0 0 1 180 140" fill="none" stroke="#0F436B" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Inner Green Ring -->
+  <path d="M 85 140 A 60 60 0 0 1 115 85" fill="none" stroke="#2E7D32" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- RED WARNING DOT -->
+  <circle cx="140" cy="85" r="8" fill="#E64A19"/>
+
+  <!-- MOUNTAIN GEOMETRY -->
+  <!-- Left Peak -->
+  <polygon points="35,150 75,105 120,150 120,195 75,175" fill="#154360"/>
+  <polygon points="75,105 87,118 78,125 65,118" fill="#ECEFF1"/> <!-- Snow -->
+
+  <!-- Main Central Peak -->
+  <polygon points="50,160 120,65 120,200" fill="#0D47A1"/> <!-- Left side -->
+  <polygon points="120,65 185,150 120,200" fill="#1976D2"/> <!-- Right side -->
+  
+  <!-- Central Peak Snow -->
+  <polygon points="120,65 100,95 110,105 120,95" fill="#FFFFFF"/>
+  <polygon points="120,65 120,95 132,102 140,90" fill="#E0E0E0"/>
+
+  <!-- Right Green Peak -->
+  <polygon points="120,200 155,105 195,160" fill="#2E7D32"/>
+  <polygon points="120,200 155,105 145,150" fill="#1B5E20"/> <!-- Depth Shadow -->
+</svg>
