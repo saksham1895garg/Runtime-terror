@@ -5,7 +5,7 @@ from supabase import Client
 from app.db.supabase import get_supabase_client
 from app.schemas.prediction import PredictionRequest, PredictionResponse
 from app.model.factory import get_predictor
-from app.model.predictor import PredictorInterface, ModelNotAvailableError
+from app.model.predictor import PredictorInterface, ModelNotAvailableError, PolicyPendingError
 from app.features.factory import get_feature_provider
 from app.features.base import FeatureProviderInterface
 from app.gee.errors import FeatureSetIncompleteError
@@ -28,6 +28,27 @@ def get_latest_prediction(
         raise HTTPException(status_code=404, detail="No prediction history for this grid.")
     
     return res.data[0]
+
+@router.get("/grid/{grid_code}/live")
+def get_live_probability(
+    grid_code: str,
+    db: Client = Depends(get_supabase_client),
+    predictor: PredictorInterface = Depends(get_predictor),
+    feature_provider: FeatureProviderInterface = Depends(get_feature_provider)
+):
+    try:
+        acquired_features = feature_provider.acquire(grid_code, db)
+        features = acquired_features.to_grid_features()
+        prob = predictor.predict_probability(features)
+        return {
+            "grid_code": grid_code,
+            "calibrated_probability": prob,
+            "model_name": getattr(predictor, "model_name", "UNKNOWN"),
+            "model_version": getattr(predictor, "model_version", "UNKNOWN"),
+            "generated_at": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/test", response_model=PredictionResponse)
 def run_test_prediction(
@@ -110,6 +131,7 @@ def run_test_prediction(
         }).eq("id", run_id).execute()
 
         # 11. Return response
+        # 11. Return response
         return PredictionResponse(
             run_id=run_id,
             grid_code=grid_code,
@@ -120,6 +142,23 @@ def run_test_prediction(
             model_version=result.model_version,
             metadata=result.metadata
         )
+
+    except PolicyPendingError as e:
+        db.table("prediction_runs").update({
+            "status": "FAILED",
+            "failed_at": datetime.utcnow().isoformat(),
+            "error_summary": str(e)
+        }).eq("id", run_id).execute()
+        
+        db.table("prediction_job_events").insert({
+            "run_id": run_id,
+            "event_type": "FAILED",
+            "message": f"Prediction failed: {str(e)}",
+            "processed_cells": 0,
+            "total_cells": 1
+        }).execute()
+
+        raise HTTPException(status_code=503, detail=str(e))
 
     except FeatureSetIncompleteError as e:
         db.table("prediction_runs").update({

@@ -40,22 +40,41 @@ export async function GET(
     ]);
 
     // 2. Fetch FastAPI Data (ML State)
-    let prediction = null;
+    let modelOutput = null;
     try {
-      const mlRes = await fetch(`http://127.0.0.1:18000/predictions/grid/${grid_code}/latest`, {
+      const mlRes = await fetch(`http://127.0.0.1:18000/predictions/grid/${grid_code}/live`, {
         cache: "no-store",
         next: { revalidate: 0 }
       });
       if (mlRes.ok) {
-        prediction = await mlRes.json();
+        modelOutput = await mlRes.json();
       }
     } catch (e) {
-      console.warn("FastAPI prediction fetch failed:", e);
+      console.warn("FastAPI live prediction fetch failed:", e);
     }
+
+    // 3. Fetch Officer Assessment from risk_predictions
+    const { data: assessmentData } = await supabase
+      .from("risk_predictions")
+      .select("*")
+      .eq("grid_code", grid_code)
+      .eq("model_name", "OFFICER_ASSESSMENT")
+      .order("generated_at", { ascending: false })
+      .limit(1)
+      .single();
 
     return NextResponse.json({
       cell,
-      prediction,
+      model_output: modelOutput ? {
+        calibrated_probability: modelOutput.calibrated_probability,
+        model_name: modelOutput.model_name,
+        model_version: modelOutput.model_version
+      } : null,
+      officer_assessment: assessmentData ? {
+        risk_category: assessmentData.risk_category,
+        model_name: assessmentData.model_name,
+        model_version: assessmentData.model_version
+      } : null,
       operational: {
         assignments: assignmentsRes.data || [],
         flags: flagsRes.data || [],

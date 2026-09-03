@@ -1,0 +1,52 @@
+{
+  "model_version": "gangtok_static_logreg_A2_sigmoid_v1",
+  "generated_at": "2026-09-03T00:17:09.254269+00:00",
+  "architecture": {
+    "family": "LogisticRegression",
+    "arm": "A2",
+    "C": 10,
+    "class_weight": "balanced",
+    "penalty": "l2",
+    "max_iter": 2000,
+    "random_state": 42,
+    "preprocessing": [
+      "SimpleImputer(strategy=median)",
+      "StandardScaler"
+    ],
+    "feature_list": [
+      "mean_elevation_m",
+      "min_elevation_m",
+      "max_elevation_m",
+      "elevation_range_m",
+      "std_elevation_m",
+      "mean_slope_deg",
+      "min_slope_deg",
+      "max_slope_deg",
+      "std_slope_deg",
+      "p25_slope_deg",
+      "p50_slope_deg",
+      "p75_slope_deg",
+      "p90_slope_deg",
+      "mean_aspect_sin",
+      "mean_aspect_cos"
+    ]
+  },
+  "calibration": {
+    "method": "sigmoid",
+    "inner_cv": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
+    "ensemble": false,
+    "note": "Calibrator fit on whole-dataset inner-CV out-of-fold raw scores; base pipeline separately refit on all deployment-training data (this file)."
+  },
+  "training_data": {
+    "rows": 2584,
+    "positives": 75,
+    "negatives": 2509,
+    "dataset_sha256": "0fdb3390b6978abfc37a05720dd32d9db66c3cb4c57dae94247181d798757501"
+  },
+  "environment": {
+    "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "sklearn_version": "1.9.0",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "model_file": "outputs\\static_model_v1\\model\\gangtok_static_logreg_A2_sigmoid_v1.joblib"
+}

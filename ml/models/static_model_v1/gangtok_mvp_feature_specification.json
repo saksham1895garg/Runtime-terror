@@ -1,0 +1,86 @@
+{
+  "status": "FROZEN_FOR_MVP_BASELINE",
+  "dataset": "/content/drive/MyDrive/landslide-mvp/data/processed/phase2/gangtok_slopeunit_labelled_static_features.csv",
+  "permanent_join_key": "slope_unit_id",
+  "target": "gsi_inventory_positive",
+  "target_semantics": {
+    "1": "At least one eligible primary-landslide GSI inventory record observed in slope unit.",
+    "0": "No eligible primary-landslide GSI inventory record observed in slope unit; not a confirmed landslide-free label."
+  },
+  "primary_baseline_features": [
+    "mean_elevation_m",
+    "min_elevation_m",
+    "max_elevation_m",
+    "elevation_range_m",
+    "std_elevation_m",
+    "mean_slope_deg",
+    "min_slope_deg",
+    "max_slope_deg",
+    "std_slope_deg",
+    "p25_slope_deg",
+    "p50_slope_deg",
+    "p75_slope_deg",
+    "p90_slope_deg",
+    "mean_aspect_sin",
+    "mean_aspect_cos"
+  ],
+  "area_sensitivity_features": [
+    "mean_elevation_m",
+    "min_elevation_m",
+    "max_elevation_m",
+    "elevation_range_m",
+    "std_elevation_m",
+    "mean_slope_deg",
+    "min_slope_deg",
+    "max_slope_deg",
+    "std_slope_deg",
+    "p25_slope_deg",
+    "p50_slope_deg",
+    "p75_slope_deg",
+    "p90_slope_deg",
+    "mean_aspect_sin",
+    "mean_aspect_cos",
+    "unit_area_km2"
+  ],
+  "hard_banned_predictors": [
+    "aspect_features_complete",
+    "gsi_inventory_positive",
+    "gsi_landslide_record_count",
+    "gsi_material_count",
+    "gsi_movement_type_count",
+    "gsi_unique_slide_no_count",
+    "raster_cell_count",
+    "slope_features_complete",
+    "slope_unit_id",
+    "terrain_features_complete"
+  ],
+  "area_policy": {
+    "column": "unit_area_km2",
+    "primary_baseline": false,
+    "sensitivity_experiment": true,
+    "reason": "Potential mixture of geomorphic information and polygon-area exposure effect under a point-derived presence target."
+  },
+  "raster_cell_count_policy": {
+    "predictor_allowed": false,
+    "reason": "Mathematically equivalent to unit area under 30 m cells: 900 m2 per cell."
+  },
+  "missingness_flags_policy": {
+    "predictor_allowed_in_primary_baseline": false,
+    "reason": "Terrain missingness is strongly associated with very small/single-cell slope units and may proxy polygon size."
+  },
+  "rainfall_policy": {
+    "static_ml_predictor": false,
+    "decision_support_layer": true,
+    "reason": "Current historical inventory lacks sufficient exact event dates for general rainfall-trigger ML training."
+  },
+  "future_predictors": {
+    "status": "OPTIONAL_MVP_ENHANCEMENT",
+    "candidates": [
+      "LULC",
+      "lithology/geology",
+      "road proximity",
+      "drainage proximity",
+      "drainage density"
+    ]
+  }
+}

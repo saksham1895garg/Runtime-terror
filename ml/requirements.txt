@@ -5,5 +5,8 @@ redis
 supabase
 pydantic
 python-dotenv
-earthengine-api 
+earthengine-api
 pydantic-settings
+scikit-learn==1.9.0
+pandas
+joblib

@@ -4,6 +4,7 @@ from app.model.factory import get_predictor
 from app.core.config import settings
 import pytest
 import os
+from unittest.mock import MagicMock
 
 def test_test_predictor_deterministic():
     generator = TestFeatureGenerator()
@@ -23,13 +24,15 @@ def test_real_model_predictor_raises(monkeypatch):
     
     # Mock exists so it initializes
     monkeypatch.setattr(os.path, "exists", lambda path: True)
-    
+    import joblib
+    monkeypatch.setattr(joblib, "load", lambda path: MagicMock())
+
     predictor = RealModelPredictor("some_path.pkl", "REAL_MODEL", "v1")
     
-    with pytest.raises(ModelNotAvailableError) as exc_info:
+    with pytest.raises(ValueError) as exc_info:
         predictor.predict(features)
     
-    assert "not fully implemented" in str(exc_info.value)
+    assert "Missing model_features" in str(exc_info.value)
 
 def test_get_predictor_factory(monkeypatch):
     monkeypatch.setattr(settings, "MODEL_BACKEND", "TEST")
