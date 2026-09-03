@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  
+  --primary: #1e3a8a; /* Stronger enterprise blue */
+  --primary-foreground: #ffffff;
+  
+  --secondary: #e2e8f0;
+  --secondary-foreground: #1e293b;
+  
+  --accent: #2563eb;
+  --accent-foreground: #ffffff;
+  
+  --destructive: #b91c1c; /* Deeper red */
+  --destructive-foreground: #ffffff;
+
+  --success: #15803d; /* Deeper green */
+  --success-foreground: #ffffff;
+  
+  --warning: #b45309; /* Deeper amber/orange */
+  --warning-foreground: #ffffff;
+  
+  --info: #0369a1; /* Deeper info blue */
+  --info-foreground: #ffffff;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #475569;
+  
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  
+  --border: #cbd5e1; /* Slightly darker border for contrast */
+  --input: #cbd5e1;
+  --ring: #1e3a8a;
+  
+  --radius: 0.375rem; /* Tighter radius for enterprise feel */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: "Inter", var(--font-geist-sans), sans-serif;
+  --font-mono: var(--font-geist-mono);
+  
+  /* Adding custom colors */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  /* Developer Console Theme - Technical Dark Mode */
+  --color-dev-bg: #09090b; /* Very dark gray */
+  --color-dev-surface: #18181b; /* Dark gray surface */
+  --color-dev-elevated: #27272a; /* Elevated surface */
+  --color-dev-elevated-hover: #3f3f46;
+  --color-dev-border: #27272a;
+  --color-dev-text: #fafafa;
+  --color-dev-text-muted: #a1a1aa;
+  
+  --color-dev-primary: #3b82f6; /* Technical blue */
+  --color-dev-secondary: #0ea5e9; /* Cyan */
+  --color-dev-accent: #6366f1; /* Indigo */
+  --color-dev-success: #22c55e; /* Bright Green */
+  --color-dev-warning: #f59e0b; /* Bright Amber */
+  --color-dev-critical: #ef4444; /* Bright Red */
+  
+  /* Custom border radii */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  
+  /* Restrained Shadows */
+  --shadow-premium: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-premium-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom Animations - Reduced */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUpFade 0.2s ease-out forwards;
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.animate-pulse-soft {
+  animation: pulseSoft 2.5s ease-in-out infinite;
+}
+
+/* Scrollbar styling - Professional */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Leaflet Map Overrides for Enterprise feel */
+.leaflet-container {
+  font-family: var(--font-sans) !important;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid var(--border) !important;
+}
+.leaflet-control-zoom a {
+  color: var(--foreground) !important;
+  background-color: var(--card) !important;
+  border-color: var(--border) !important;
+}
+.leaflet-control-zoom a:hover {
+  background-color: var(--secondary) !important;
+}
+
