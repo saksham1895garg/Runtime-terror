@@ -5,4 +5,5 @@ redis
 supabase
 pydantic
 python-dotenv
-earthengine-api  pydantic-settings
+earthengine-api 
+pydantic-settings
