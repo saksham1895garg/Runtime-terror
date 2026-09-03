@@ -11,12 +11,17 @@ router = APIRouter()
 @router.get("/")
 def health_check(db: Client = Depends(get_supabase_client)):
     # DB Check
-    db_ok = False
+    db_status = "unreachable"
     try:
-        res = db.table("analysis_grid_cells").select("id").limit(1).execute()
-        db_ok = True
+        res = db.table("analysis_grid_cells").select("grid_code").limit(1).execute()
+        db_status = "connected"
     except Exception as e:
         logger.error(f"DB Health check failed: {e}")
+        # If it's an APIError, it means we reached Supabase but the query failed (e.g. schema error)
+        if "APIError" in str(type(e)):
+            db_status = "error"
+        else:
+            db_status = "unreachable"
 
     # Redis/Celery check
     redis_ok = False
@@ -29,9 +34,9 @@ def health_check(db: Client = Depends(get_supabase_client)):
         logger.error(f"Redis Health check failed: {e}")
 
     return {
-        "status": "ok" if (db_ok and redis_ok) else "degraded",
+        "status": "ok" if (db_status == "connected" and redis_ok) else "degraded",
         "service": "dhara-soochak-ml",
         "phase": 8,
-        "database": "connected" if db_ok else "unreachable",
+        "database": db_status,
         "redis_queue": "connected" if redis_ok else "unreachable"
     }
